@@ -48,7 +48,7 @@ public:
 template<class T>
 ostream& operator << (ostream& ustream, Element<T>& obj)
 {
-	ustream << obj.field;
+	ustream << "\n" << obj.field;
 	return ustream;
 }
 
@@ -67,9 +67,17 @@ public:
 	{
 		return head;
 	}
+	void setBegin(Element<T>* value)
+	{
+		head = value;
+	}
 	virtual Element<T>* getEnd() 
 	{
 		return tail;
+	}
+	void setEnd(Element<T>* value)
+	{
+		tail = value;
 	}
 	LinkedListParent()
 	{
@@ -226,30 +234,29 @@ protected:
 
 public:
 	using LinkedListParent<T>::getEnd;
+	using LinkedListParent<T>::setEnd;
 	using LinkedListParent<T>::getBegin;
+	using LinkedListParent<T>::setBegin;
+	using LinkedListParent<T>::num;
 
 	Element<T>* push(T value)
 	{
-		Element<T>* endElem = getEnd();
-		Element<T>* newElem = new Element<T>(value,NULL,endElem);
-		Element<T>* nextElem = &*endElem->getNext();
-		nextElem = newElem;
-		*newElem->getPrevious() = *endElem;
-				 
-		*newElem->getPrevious() = *endElem;
-		*endElem = *newElem;
-
-		return newElem;
+		Element<T> newElem(value);
+		newElem.setPrevious(getEnd());
+		getEnd()->setNext(&newElem);
+		setEnd(&newElem);
+		num++;
+		return &newElem;
 	}
 
 	/// <returns>deleted element</returns>
 	Element<T>* pop()
 	{
-		Element<T>* secondElem = getBegin()->getNext();
-		*(secondElem->getPrevious()) = *secondElem;
-		Element<T>* deleted = getBegin();
-		delete(getBegin());
-		return deleted;
+		Element<T>& secondElem = *getBegin()->getNext();
+		setBegin(nullptr);
+		setBegin(&secondElem);
+		secondElem.setPrevious(nullptr);
+		return new Element<T>;
 	}
 };
 
@@ -276,18 +283,16 @@ public:
 int main()
 {
 	D<int> obj;
+	obj.push(110);
+
 	ListIterator<int> iter(obj.begin());
-	for (int i = 0;i < 5;i++)
+	for (int i = 1; i < 6; i++)
 	{
 		obj.push(i);
-		
+		//cout << *iter;
+		//iter++;
 	}
 	
-	for (int i = 0;i < 5;i++,iter++)
-	{
-		cout << "\n" << *iter;
-
-	}
 
 	
 	return 0;
