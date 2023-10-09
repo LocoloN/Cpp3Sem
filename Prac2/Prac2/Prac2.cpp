@@ -175,7 +175,7 @@ public:
 	}
 
 	//need for BOOST_FOREACH
-	Element<ValueType>& operator-()
+	Element<ValueType>& operator*()
 	{
 		return *ptr;
 	}
@@ -286,6 +286,7 @@ public:
 		newElem->setNext(itElem->getNext());
 		itElem->setNext(newElem);
 		itElem->getNext()->setPrevious(newElem);
+		num++;
 		return newElem;
 	}
 
@@ -308,7 +309,21 @@ public:
 		return deletedElem;
 	}
 };
+template <typename T>
+IteratedLinkedList<T>* filter(IteratedLinkedList<T> *obj, bool (*P)(Element<T>))
+{
+	D<T> *processedList = obj;
+	IteratedLinkedList<T>* resultList;
 
+	processedList->iterator = processedList->begin();
+
+	while (processedList->iterator.getValue().getNext())
+	{
+		(P(processedList->iterator.getValue())) ? resultList->push(processedList->iterator.getValue()) :void() ;
+	}
+	resultList->pop();
+	return resultList();
+}
 
 //Постройте наследник класса D.Переопределите функцию добавления
 //нового элемента таким образом, чтобы контейнер оставался упорядоченным. Упорядочены по какому признаку???
@@ -325,9 +340,10 @@ public:
 	
 };
 
-
-
-
+bool test()
+{
+	return true;
+}
 
 int main()
 {
@@ -338,16 +354,28 @@ int main()
 		obj.push(i);
 	}
 	obj.pop();
-	obj.begin();
+	obj.iterator = obj.begin();
 	for (int i = 0; i < obj.num; i++)
 	{
 		cout << obj.iterator.getValue();
 		obj.iterator++;
 	}
+	cout << "\n\n\n";
+
+	obj.iterator = obj.end();
+
 	--obj.iterator;
 	int x = 123;
 	obj.push(x, &obj.iterator);
 	
-	
+	obj.iterator = obj.begin();
+	for (int i = 0; i < obj.num; i++)
+	{
+		cout << obj.iterator.getValue();
+		obj.iterator++;
+	}
+
+	filter<int>((IteratedLinkedList<int>)obj,test);
+
 	return 0;
 }
