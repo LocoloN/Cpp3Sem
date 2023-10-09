@@ -4,7 +4,7 @@
 using namespace std;
 
 
-//Вариант 23, очередь
+//Вариант 21, очередь
 template <class T>
 class Element
 {
@@ -72,6 +72,13 @@ public:
 		cout << "\nParent constructor";
 		Element<T> *firstElement = new Element<T>();
 
+		head = firstElement;
+		tail = firstElement;
+		num = 1;
+	}
+	LinkedListParent(T val)
+	{
+		Element<T>* firstElement = new Element<T>(val);
 		head = firstElement;
 		tail = firstElement;
 		num = 1;
@@ -153,6 +160,11 @@ public:
 
 	ListIterator(const ListIterator& it) { ptr = it.ptr; }
 
+	Element<ValueType>& getValue()
+	{
+		return *ptr;
+	}
+
 	bool operator!=(ListIterator const& other) const {
 		return ptr != other.ptr;
 	}
@@ -163,7 +175,7 @@ public:
 	}
 
 	//need for BOOST_FOREACH
-	Element<ValueType>& operator*()
+	Element<ValueType>& operator-()
 	{
 		return *ptr;
 	}
@@ -173,6 +185,10 @@ public:
 	}
 	ListIterator& operator++(int v) {
 		ptr = ptr->getNext();
+		return *this;
+	}
+	ListIterator& operator--() {
+		ptr = ptr->getPrevious();
 		return *this;
 	}
 	ListIterator& operator=(const ListIterator& it) {
@@ -196,19 +212,27 @@ public:
 	{
 		cout << "\nIteratedLinkedList constructor";
 	}
+	IteratedLinkedList(T val) : LinkedListParent<T>(val)
+	{
+
+	}
 	virtual ~IteratedLinkedList()
 	{
 		cout << "\nIteratedLinkedList destructor";
 	}
+
 	ListIterator<T> iterator;
+
 	ListIterator<T> begin()
 	{
-		ListIterator<T> it = LinkedListParent<T>::head; return it;
+		ListIterator<T> it = LinkedListParent<T>::head;
+		return it;
 		
 	}
 	ListIterator<T> end()
 	{
-		ListIterator<T> it = LinkedListParent<T>::tail; return it;
+		ListIterator<T> it = LinkedListParent<T>::tail; 
+		return it;
 	}
 };
 
@@ -226,8 +250,19 @@ public:
 	using LinkedListParent<T>::tail;
 	using LinkedListParent<T>::num;
 
+	D(T val) : IteratedLinkedList<T>(val)
+	{
+
+	}
 	Element<T>* push(T value)
 	{
+		/*
+		Element<T> newElem(value);
+		Element<T>* endElem = getEnd();
+		newElem.setPrevious(endElem);
+		endElem->setNext(&newElem);
+		tail = &newElem;*/
+
 		Element<T>* newElem = new Element<T>(value);
 		Element<T>* endElem = getEnd();
 		newElem->setPrevious(endElem);
@@ -236,15 +271,41 @@ public:
 		num++;
 		return newElem;
 	}
+	/// <summary>
+	/// inserts element afret iterated
+	/// </summary>
+	/// <param name="val">new element value</param>
+	/// <param name="iter">iterator</param>
+	/// <returns>pushed new element</returns>
+	Element<T>* push(const T& val, ListIterator<T>* iter)
+	{
+		Element<T>* newElem = new Element<T>(val);
+		Element<T>* itElem = &iter->getValue();
+
+		newElem->setPrevious(itElem);
+		newElem->setNext(itElem->getNext());
+		itElem->setNext(newElem);
+		itElem->getNext()->setPrevious(newElem);
+		return newElem;
+	}
 
 	/// <returns>deleted element</returns>
 	Element<T>* pop()
 	{
+		Element<T>* deletedElem = getBegin();
+		if (!getBegin()->getNext())
+		{
+			delete getBegin();
+			head = NULL;
+			tail = NULL;
+			return deletedElem;
+		}
 		Element<T>* secondElem = getBegin()->getNext();
+		delete(head);
 		head = secondElem;
 		secondElem->setPrevious(nullptr);
 		num--;
-		return new Element<T>;
+		return deletedElem;
 	}
 };
 
@@ -270,18 +331,23 @@ public:
 
 int main()
 {
-	D<int> obj;
-	obj.push(110);
+	D<int> obj(110);
 
-	ListIterator<int> iter(obj.begin());
-	for (int i = 1; i < 6; i++)
+	for (int i = 1; i < 5; i++)
 	{
 		obj.push(i);
-		//cout << *iter;
-		//iter++;
 	}
+	obj.pop();
+	obj.begin();
+	for (int i = 0; i < obj.num; i++)
+	{
+		cout << obj.iterator.getValue();
+		obj.iterator++;
+	}
+	--obj.iterator;
+	int x = 123;
+	obj.push(x, &obj.iterator);
 	
-
 	
 	return 0;
 }
