@@ -371,6 +371,7 @@ bool test()
 
 int main()
 {
+	setlocale(LC_ALL,"ru");
 	D<int> obj(110);
 
 	for (int i = 1; i < 5; i++)
