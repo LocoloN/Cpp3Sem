@@ -16,16 +16,11 @@ private:
 	//информация, хранимая в поле
 	T field;
 public:
-	Element(T value, Element<T> *next_ptr = NULL, Element<T> *prev_ptr = NULL)
+	Element(T value = NULL, Element<T> *next_ptr = NULL, Element<T> *prev_ptr = NULL)
 	{
 		field = value;
 		next = next_ptr;
 		prev = prev_ptr;
-	}
-	Element()
-	{
-		next = this;
-		prev = this;
 	}
 	//доступ к полю *next
 	virtual Element* getNext() { return next; }
@@ -67,17 +62,9 @@ public:
 	{
 		return head;
 	}
-	void setBegin(Element<T>* value)
-	{
-		head = value;
-	}
 	virtual Element<T>* getEnd() 
 	{
 		return tail;
-	}
-	void setEnd(Element<T>* value)
-	{
-		tail = value;
 	}
 	LinkedListParent()
 	{
@@ -234,28 +221,29 @@ protected:
 
 public:
 	using LinkedListParent<T>::getEnd;
-	using LinkedListParent<T>::setEnd;
 	using LinkedListParent<T>::getBegin;
-	using LinkedListParent<T>::setBegin;
+	using LinkedListParent<T>::head;
+	using LinkedListParent<T>::tail;
 	using LinkedListParent<T>::num;
 
 	Element<T>* push(T value)
 	{
-		Element<T> newElem(value);
-		newElem.setPrevious(getEnd());
-		getEnd()->setNext(&newElem);
-		setEnd(&newElem);
+		Element<T>* newElem = new Element<T>(value);
+		Element<T>* endElem = getEnd();
+		newElem->setPrevious(endElem);
+		endElem->setNext(newElem);
+		tail = newElem;
 		num++;
-		return &newElem;
+		return newElem;
 	}
 
 	/// <returns>deleted element</returns>
 	Element<T>* pop()
 	{
-		Element<T>& secondElem = *getBegin()->getNext();
-		setBegin(nullptr);
-		setBegin(&secondElem);
-		secondElem.setPrevious(nullptr);
+		Element<T>* secondElem = getBegin()->getNext();
+		head = secondElem;
+		secondElem->setPrevious(nullptr);
+		num--;
 		return new Element<T>;
 	}
 };
