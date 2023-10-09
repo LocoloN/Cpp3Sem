@@ -4,6 +4,17 @@
 using namespace std;
 
 
+
+
+class looseElementException : exception
+{
+	virtual const char* what() const
+	{
+		return "Iterator is not associated with any element";
+	}
+
+};
+
 //Вариант 21, очередь
 template <class T>
 class Element
@@ -162,6 +173,7 @@ public:
 
 	Element<ValueType>& getValue()
 	{
+		(!ptr) ? throw looseElementException():void();
 		return *ptr;
 	}
 
@@ -340,6 +352,18 @@ public:
 	
 };
 
+template <typename T>
+void displayList(D<T> *obj)
+{
+	obj.iterator = obj.begin();
+	for (int i = 0; i < obj.num; i++)
+	{
+		cout << obj.iterator.getValue();
+		obj.iterator++;
+	}
+}
+
+
 bool test()
 {
 	return true;
@@ -375,7 +399,6 @@ int main()
 		obj.iterator++;
 	}
 
-	filter<int>((IteratedLinkedList<int>)obj,test);
 
 	return 0;
 }
